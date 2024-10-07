@@ -1,0 +1,4 @@
+apple red 5
+banana yellow 3
+cherry red 7
+date brown 2
