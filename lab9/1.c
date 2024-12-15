@@ -24,7 +24,7 @@ void *a_th(void *arg) {
     printf("Statement A2 executed\n");
 }
 
-void *b_th(void *arg) {
+void *b_th() {
     printf("Statement B1 executed\n");
     
     sem_post(&a1);
@@ -39,6 +39,8 @@ int main() {
     
     sem_init(&a1,0,0);
     sem_init(&b1,0,0);
+
+    pthread_attr_t arr[5];
     
     if(pthread_create(&t1,NULL,a_th,NULL)!=0){
         perror("Error in creating the thread t1");

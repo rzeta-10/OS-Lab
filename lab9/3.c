@@ -11,6 +11,7 @@
 sem_t readSem;
 sem_t writeSem;
 pthread_mutex_t bufLock;
+sem_t lock;
 
 int buf[SIZE];
 int readCnt = 0;
@@ -18,14 +19,15 @@ int readCnt = 0;
 void *reader(void *args) {
     do {
         sem_wait(&readSem);  
-        pthread_mutex_lock(&bufLock);
-        
+        //pthread_mutex_lock(&bufLock);
+        sem_wait(&lock);
         readCnt++;
         if (readCnt == 1) {
             sem_wait(&writeSem);  
         }
         
-        pthread_mutex_unlock(&bufLock);
+        //pthread_mutex_unlock(&bufLock);
+        sem_post(&lock);
         sem_post(&readSem);
         
         sleep(3);
@@ -36,12 +38,14 @@ void *reader(void *args) {
         }
         printf("]\n");
         
-        pthread_mutex_lock(&bufLock);
+        // pthread_mutex_lock(&bufLock);
+        sem_wait(&lock);
         readCnt--;
         if (readCnt == 0) {
             sem_post(&writeSem);
         }
-        pthread_mutex_unlock(&bufLock);
+        sem_post(&lock);
+        //pthread_mutex_unlock(&bufLock);
         
         sleep(1);
     } while (1);
@@ -80,7 +84,7 @@ int main() {
     pthread_mutex_init(&bufLock, NULL);
     sem_init(&readSem, 0, 1);    
     sem_init(&writeSem, 0, 1);   
-    
+    sem_init(&lock,0,1);
     for (int i = 0; i < 5; i++) {
         if (pthread_create(&r[i], NULL, &reader, NULL) != 0) {
             perror("Error creating reader thread\n");

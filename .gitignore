@@ -5,3 +5,5 @@
 *.odt
 *.ppt
 *.txt
+.vscode/
+slides/
